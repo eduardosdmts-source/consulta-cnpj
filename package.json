@@ -6,11 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:restrito": "cross-env VITE_RESTRICTED=true vite build --outDir dist-restrito",
-    "build:all": "npm run build && npm run build:restrito && node scripts/merge-restrito.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
-    "deploy": "npm run build:all && gh-pages -d dist"
+    "deploy": "npm run build && node scripts/build-root-redirect.mjs && gh-pages -d dist"
   },
   "dependencies": {
     "react": "^19.2.7",
@@ -21,7 +19,6 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
-    "cross-env": "^10.1.0",
     "gh-pages": "^6.3.0",
     "oxlint": "^1.71.0",
     "tailwindcss": "^4.3.3",
