@@ -8,8 +8,7 @@ import SecondaryActivities from './components/SecondaryActivities'
 import PartnersSection from './components/PartnersSection'
 import JsonViewer from './components/JsonViewer'
 import { onlyDigits } from './lib/format'
-
-const API_BASE_URL = 'https://publica.cnpj.ws/cnpj'
+import siteConfig from '../site.config.mjs'
 
 function App() {
   const [inputValue, setInputValue] = useState('')
@@ -30,7 +29,7 @@ function App() {
     setError(null)
 
     try {
-      const response = await fetch(`${API_BASE_URL}/${digits}`)
+      const response = await fetch(`${siteConfig.apiBaseUrl}/${digits}`)
 
       if (response.status === 404) {
         setData(null)
@@ -70,12 +69,8 @@ function App() {
     <div className="min-h-screen px-4 py-10 sm:py-16">
       <div className="max-w-4xl mx-auto flex flex-col gap-8">
         <header className="text-center">
-          <h1 className="text-3xl sm:text-4xl font-semibold text-slate-900">
-            Consulta completa CNPJ
-          </h1>
-          <p className="mt-2 text-slate-500">
-            Dados cadastrais, societários e fiscais em um único lugar (Use com responsabilidade e ética)
-          </p>
+          <h1 className="text-3xl sm:text-4xl font-semibold text-slate-900">{siteConfig.siteName}</h1>
+          <p className="mt-2 text-slate-500">{siteConfig.subtitle}</p>
         </header>
 
         <div className="flex flex-col gap-3">
