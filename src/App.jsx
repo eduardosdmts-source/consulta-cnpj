@@ -6,8 +6,12 @@ import SkeletonResult from './components/SkeletonResult'
 import ResultCard from './components/ResultCard'
 import SecondaryActivities from './components/SecondaryActivities'
 import PartnersSection from './components/PartnersSection'
+import DebtCheckLinks from './components/DebtCheckLinks'
+import MeiExcludedNotice from './components/MeiExcludedNotice'
+import AdvancedSearch from './components/AdvancedSearch'
 import JsonViewer from './components/JsonViewer'
-import { onlyDigits } from './lib/format'
+import { fetchCNPJ, ApiError } from './lib/api'
+import { isMEI } from './lib/tax'
 import siteConfig from '../site.config.mjs'
 
 function App() {
@@ -15,51 +19,25 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [data, setData] = useState(null)
+  const [meiNotice, setMeiNotice] = useState(null)
 
   async function handleSearch() {
-    const digits = onlyDigits(inputValue)
-
-    if (digits.length !== 14) {
-      setError('CNPJ inválido. Digite os 14 números do CNPJ.')
-      setData(null)
-      return
-    }
-
     setLoading(true)
     setError(null)
+    setMeiNotice(null)
+    setData(null)
 
     try {
-      const response = await fetch(`${siteConfig.apiBaseUrl}/${digits}`)
+      const json = await fetchCNPJ(inputValue)
 
-      if (response.status === 404) {
-        setData(null)
-        setError('CNPJ não encontrado. Verifique o número digitado.')
+      if (isMEI(json)) {
+        setMeiNotice({ razaoSocial: json.razao_social })
         return
       }
 
-      if (response.status === 400) {
-        setData(null)
-        setError('CNPJ inválido. Verifique se os números digitados estão corretos.')
-        return
-      }
-
-      if (response.status === 429) {
-        setData(null)
-        setError('Muitas consultas em pouco tempo. Aguarde um instante e tente novamente.')
-        return
-      }
-
-      if (!response.ok) {
-        setData(null)
-        setError('Não foi possível consultar o CNPJ. Tente novamente mais tarde.')
-        return
-      }
-
-      const json = await response.json()
       setData(json)
-    } catch {
-      setData(null)
-      setError('Erro de conexão. Verifique sua internet e tente novamente.')
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Erro inesperado. Tente novamente.')
     } finally {
       setLoading(false)
     }
@@ -81,20 +59,24 @@ function App() {
             loading={loading}
           />
           {error && <ErrorMessage message={error} />}
+          {!loading && meiNotice && <MeiExcludedNotice info={meiNotice} />}
         </div>
 
         {loading && <SkeletonResult />}
 
-        {!loading && !error && !data && <EmptyState />}
+        {!loading && !error && !meiNotice && !data && <EmptyState />}
 
         {!loading && data && (
           <>
             <ResultCard data={data} />
             <SecondaryActivities atividades={data.estabelecimento?.atividades_secundarias} />
             <PartnersSection socios={data.socios} />
+            <DebtCheckLinks />
             <JsonViewer data={data} />
           </>
         )}
+
+        <AdvancedSearch />
       </div>
     </div>
   )
