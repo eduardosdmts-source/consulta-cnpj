@@ -10,6 +10,7 @@ import {
   MapPinIcon,
   PhoneIcon,
   MailIcon,
+  PercentIcon,
 } from './icons'
 import {
   formatCNPJDigits,
@@ -21,12 +22,14 @@ import {
   isSituacaoAtiva,
   getAtividadePrincipal,
 } from '../lib/format'
+import { getRegimeTributario, getRegimeLabel } from '../lib/tax'
 
 export default function ResultCard({ data }) {
   const estabelecimento = data.estabelecimento || {}
   const situacao = getSituacaoCadastral(estabelecimento)
   const ativa = isSituacaoAtiva(estabelecimento)
   const telefone = formatPhone(estabelecimento.ddd1, estabelecimento.telefone1)
+  const regime = getRegimeLabel(getRegimeTributario(data))
 
   return (
     <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-6 sm:p-8">
@@ -49,6 +52,7 @@ export default function ResultCard({ data }) {
           value={formatCNPJDigits(estabelecimento.cnpj)}
         />
         <InfoItem icon={<TagIcon />} label="Porte" value={data.porte?.descricao} />
+        <InfoItem icon={<PercentIcon />} label="Regime tributário" value={regime} />
         <InfoItem
           icon={<CalendarIcon />}
           label="Data de abertura"
