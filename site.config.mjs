@@ -11,7 +11,7 @@ export default {
   outDir: 'dist/restrito',
 
   // Gerada com: node -e "console.log(require('crypto').createHash('sha256').update('SENHA').digest('hex'))"
-  passwordHash: 'e3cce0f6889c3fc85c68954cc3e03364895ffae5c6ddd9cd18c01151920f0d3b',
+  passwordHash: 'd919fd01d264c21b0504467fffba5265aa8bb0587efe78e80d68beea0956dd16',
   storageKey: 'consulta-cnpj-restrito-auth',
 
   apiBaseUrl: 'https://publica.cnpj.ws/cnpj',
